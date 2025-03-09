@@ -6,8 +6,10 @@ import sys
 import csv
 
 # ✅ Ensure we can import forest data functions
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "dataset", "forest")))
-from forest_data import get_forest_loss  
+from forest.forest_data import get_forest_loss  
+
+# ✅ Import slope data function
+from slope_data import getSlope
 
 # ✅ Read input data
 input_data = []
@@ -61,6 +63,10 @@ def get_forest_loss_data(lat, lon, date):
     year = int(date[:4])  # Extract the year from the date
     return get_forest_loss(lat, lon, year)
 
+# ✅ Fetch slope data
+def get_slope_data(lat, lon):
+    return getSlope(lat, lon)
+
 # ✅ Process input data and store results
 results = []
 for lat, lon, date, landslide in input_data:
@@ -68,6 +74,7 @@ for lat, lon, date, landslide in input_data:
     
     forest_loss = get_forest_loss_data(lat, lon, formatted_date)
     weather = get_weather_data(lat, lon, formatted_date)
+    slope = get_slope_data(lat, lon)
     
     if weather:
         row = [formatted_date, lat, lon]
@@ -83,6 +90,7 @@ for lat, lon, date, landslide in input_data:
             ])
 
         row.append(forest_loss)
+        row.append(slope)
         row.append(landslide)
         results.append(row)
 
@@ -95,7 +103,7 @@ with open(output_file, mode="w", newline="") as file:
     headers = ["Date", "Latitude", "Longitude"]
     for i in range(15, 6, -1):
         headers.extend([f"precip{i}", f"temp{i}", f"air{i}", f"humidity{i}", f"wind{i}"])
-    headers.extend(["Forest_Loss", "Landslide"])
+    headers.extend(["Forest_Loss", "Slope", "Landslide"])
     
     writer.writerow(headers)
     writer.writerows(results)
