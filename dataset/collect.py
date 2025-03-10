@@ -21,11 +21,9 @@ with open("input.txt", "r") as file:
         landslide_flag = int(landslide_flag)
         input_data.append((lat, lon, date, landslide_flag))
 
-# ✅ Convert date format to YYYY-MM-DD
 def format_date(date_str):
     return datetime.datetime.strptime(date_str, "%m/%d/%y").strftime("%Y-%m-%d")
 
-# ✅ Fetch daily weather data from Open-Meteo (last 15 days)
 def get_weather_data(lat, lon, date):
     base_url = "https://archive-api.open-meteo.com/v1/archive"
     start_date = (datetime.datetime.strptime(date, "%Y-%m-%d") - datetime.timedelta(days=15)).strftime("%Y-%m-%d")
@@ -44,9 +42,7 @@ def get_weather_data(lat, lon, date):
 
     if response.status_code == 200:
         weather_data = response.json().get("daily", {})
-        print(f"✅ Weather data received for {lat}, {lon}")
-
-        # Extract last 15 to 7 days of data
+        print(f"Weather data received for {lat}, {lon}")
         return {
             "precipitation": weather_data.get("precipitation_sum", [])[:9],  # Last 15 to 7 days
             "temperature": [(max_ + min_) / 2 for max_, min_ in zip(weather_data.get("temperature_2m_max", []), weather_data.get("temperature_2m_min", []))][:9],
@@ -55,7 +51,7 @@ def get_weather_data(lat, lon, date):
             "wind_speed": weather_data.get("wind_speed_10m_max", [])[:9]
         }
     else:
-        print(f"❌ Error fetching weather data for {lat}, {lon}: {response.text}")
+        print(f"Error fetching weather data for {lat}, {lon}: {response.text}")
         return None
 
 # ✅ Fetch forest loss data
